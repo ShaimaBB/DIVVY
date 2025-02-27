@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DIVVY</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <div class="container mx-auto p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold">Hello, <%= user %>!</h1>
+      <form action="/logout" method="POST">
+        <button class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">
+            Logout
+        </button>
+    </form>
+    
+    </div>
+
+    <!-- Groups Section -->
+    <div class="bg-white p-6 rounded shadow-lg mb-6">
+      <h2 class="text-lg font-semibold mb-4">Your Groups</h2>
+      <!-- Group Records -->
+      <ul class="space-y-4">
+        <% groups.forEach(group => { %>
+        <li class="bg-gray-50 p-4 rounded shadow">
+        <a
+          href="/add-members/<%= group._id %>"
+          class="text-xl font-bold text-blue-500 hover:underline"
+        >
+          <%= group.name %>
+        </a>
+        <p class="text-gray-600">Created by: <%= group.creator %></p>
+        </li>
+       <% }) %>
+      <% if (groups.length === 0) { %>
+      <p class="text-gray-600">No groups found. Create a new group below!</p>
+      <% } %>
+  </ul>
+  
+    </div>
+
+    <!-- Create New Group Section -->
+    <div class="bg-white p-6 rounded shadow-lg">
+      <h2 class="text-lg font-semibold mb-4">Create a New Group</h2>
+      <form action="/create-group" method="POST">
+        <div class="mb-4">
+          <label for="groupName" class="block text-gray-700">Group Name:</label>
+          <input
+            type="text"
+            id="groupName"
+            name="groupName"
+            class="w-full p-2 border rounded"
+            placeholder="Enter group name"
+            required
+          />
+        </div>
+        <button
+          type="submit"
+          class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+        >
+          Create Group
+        </button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

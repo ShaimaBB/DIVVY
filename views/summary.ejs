@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Summary</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex justify-center items-center h-screen">
+  <div class="bg-white p-8 rounded shadow-lg w-full max-w-lg">
+    <h1 class="text-2xl font-bold text-center mb-4">Summary</h1>
+    <ul class="list-disc ml-6 mb-4">
+      <% members.forEach((member, index) => { %>
+        <li class="flex justify-between items-center">
+          <span><%= member %>: 
+            <% if (paidStatus[index]) { %>
+              Paid
+            <% } else { %>
+              <%= splitAmount %> owes
+            <% } %>
+          </span>
+          <% if (!paidStatus[index]) { %>
+            <form method="POST" action="/mark-paid" class="inline">
+              <input type="hidden" name="members" value='<%= JSON.stringify(members) %>'>
+              <input type="hidden" name="splitAmount" value="<%= splitAmount %>">
+              <input type="hidden" name="index" value="<%= index %>">
+              <input type="hidden" name="paidStatus" value='<%= JSON.stringify(paidStatus) %>'>
+              <button
+                type="submit"
+                class="bg-green-500 text-white py-1 px-2 rounded hover:bg-green-600"
+              >
+                Paid
+              </button>
+            </form>
+          <% } %>
+        </li>
+      <% }); %>
+    </ul>
+    <button
+      onclick="window.location.href='/dashboard'"
+      class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+    >
+      Back to Dashboard
+    </button>
+  </div>
+</body>
+</html>

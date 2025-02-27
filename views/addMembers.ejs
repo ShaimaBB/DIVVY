@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>DIVVY</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <header class="bg-white shadow-md fixed top-0 w-full p-4 flex justify-between items-center">
+    <h1 class="text-2xl font-bold text-gray-800">DIVVY</h1>
+    <form action="/logout" method="POST">
+      <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+        Logout
+      </button>
+    </form>
+  </header>
+
+  <div class="container mx-auto p-6 mt-20">
+    <div class="bg-white p-8 rounded shadow-lg max-w-lg mx-auto">
+      <h1 class="text-2xl font-bold text-center mb-6">Manage <%= group.name %></h1>
+
+      <!-- Add Members Form -->
+      <form id="addMembersForm" method="POST" action="/add-members/<%= group._id %>">
+        <div id="membersContainer" class="space-y-4">
+          <% group.members.forEach(member => { %>
+            <div class="member-item flex items-center justify-between group hover:bg-gray-50 p-2 rounded">
+              <div class="flex items-center w-4/5">
+                <span class="w-1/4"><%= member %></span>
+                <input 
+                  type="text" 
+                  name="members[]" 
+                  value="<%= member %>" 
+                  class="w-3/4 p-2 border rounded"
+                  <%= member === currentUser ? 'readonly' : '' %>
+                  required
+                  pattern=".*\S+.*"
+                  title="Member name cannot be empty"
+                >
+              </div>
+              <% if (member !== currentUser) { %>
+                <form 
+                  method="POST" 
+                  action="/delete-member/<%= group._id %>"
+                  class="delete-form opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <input type="hidden" name="memberToDelete" value="<%= member %>">
+                  <button 
+                    type="button"
+                    class="delete-member-btn p-1 text-red-500 hover:text-red-700 rounded-full hover:bg-red-100"
+                    aria-label="Delete member"
+                  >
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M4 7h16m-10-4h4a1 1 0 011 1v2H9V4a1 1 0 011-1z"/>
+                    </svg>
+                  </button>
+                </form>
+              <% } %>
+            </div>
+          <% }); %>
+        </div>
+        <button type="button" id="addMemberButton" class="bg-blue-500 text-white py-2 px-4 rounded mt-4 hover:bg-blue-600">
+          Add New Member
+        </button>
+        <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded mt-4 hover:bg-blue-700">
+          Save Members
+        </button>
+      </form>
+
+      <!-- Amount Calculator -->
+      <form id="totalAmountForm" class="mt-6">
+        <div class="mb-4">
+          <label class="block text-gray-700 mb-2">Total Amount ($)</label>
+          <input type="number" id="totalAmount" step="0.01" class="w-full p-2 border rounded" required>
+        </div>
+        <button type="submit" class="w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">
+          Calculate Shares
+        </button>
+      </form>
+
+      <!-- Balances Display -->
+      <div id="balancesSection" class="mt-6 hidden">
+        <h2 class="text-xl font-semibold mb-4">Payment Status</h2>
+        <ul id="balancesList" class="space-y-3"></ul>
+      </div>
+    </div>
+  </div>
+      
+
+  <script>
+    const currentUser = "<%= currentUser %>";
+    const groupId = "<%= group._id %>";
+
+    // Add member fields
+    document.getElementById("addMemberButton").addEventListener("click", () => {
+      const newField = document.createElement("div");
+      newField.className = "flex items-center mt-2";
+      newField.innerHTML = `
+        <label class="block text-gray-700 w-1/4">New Member:</label>
+        <input type="text" name="members[]" class="w-3/4 p-2 border rounded" required>
+      `;
+      document.getElementById("membersContainer").appendChild(newField);
+    });
+
+    // Handle amount calculation
+    document.getElementById("totalAmountForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const amountInput = document.getElementById("totalAmount");
+      const amount = parseFloat(amountInput.value);
+
+      if (isNaN(amount) || amount <= 0) {
+        alert("Please enter a valid positive amount");
+        amountInput.focus();
+        return;
+      }
+
+      try {
+        const response = await fetch(`/split-amount/${groupId}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ totalAmount: amount })
+        });
+
+        // Handle response format
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          throw new Error("Server returned invalid response");
+        }
+
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || "Calculation failed");
+        }
+
+        const balancesList = document.getElementById("balancesList");
+        balancesList.innerHTML = "";
+        data.balances.forEach((balance, index) => {
+          const li = document.createElement("li");
+          li.className = "flex justify-between items-center bg-gray-50 p-3 rounded mb-2";
+
+          if (balance.member === currentUser) {
+            // Admin's entry
+            li.innerHTML = `
+              <div class="flex-1">
+                <span class="font-medium">You (${balance.member})</span>
+                paid $${balance.amount.toFixed(2)}
+              </div>
+            `;
+          } else {
+            // Other members' entries
+            li.innerHTML = `
+              <div class="flex-1">
+                <span class="font-medium">${balance.member}</span> 
+                owes $${balance.amount.toFixed(2)} to ${balance.owedTo}
+              </div>
+              <button class="paid-btn bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                      data-index="${index}"
+                      ${balance.amount === 0 ? 'disabled' : ''}>
+                ${balance.amount === 0 ? '✓ Paid' : 'Mark Paid'}
+              </button>
+            `;
+          }
+
+          balancesList.appendChild(li);
+        });
+
+        document.getElementById("balancesSection").classList.remove("hidden");
+        
+        
+      } catch (error) {
+        alert(`Error: ${error.message}`);
+        console.error("Calculation Error:", error);
+      }
+    });
+
+    // Handle payment marking
+    document.addEventListener("click", async (e) => {
+      if (e.target.classList.contains("paid-btn")) {
+        const button = e.target;
+        const index = button.dataset.index;
+        
+        try {
+          const response = await fetch(`/mark-paid/${groupId}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ memberIndex: index })
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to update payment status");
+          }
+
+          button.disabled = true;
+          button.textContent = "✓ Paid";
+          button.classList.replace("bg-green-500", "bg-gray-400");
+        } catch (error) {
+          alert("Payment update failed. Please try again.");
+        }
+      }
+    });
+    
+    // Delete Member Handling
+    document.addEventListener("click", async (e) => {
+    const deleteBtn = e.target.closest(".delete-member-btn");
+    if (!deleteBtn) return;
+
+    const form = deleteBtn.closest("form");
+    const memberName = form.querySelector("[name=memberToDelete]").value;
+    const memberElement = form.closest(".member-item");
+
+    deleteBtn.disabled = true;
+    deleteBtn.innerHTML = `Deleting...`;
+
+    try {
+        const response = await fetch(form.action, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ memberToDelete: memberName })
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Deletion failed");
+
+        // Remove the deleted member from UI
+        memberElement.remove();
+
+    } catch (error) {
+        alert(`Delete failed: ${error.message}`);
+    } finally {
+        deleteBtn.disabled = false;
+        deleteBtn.innerHTML = "Delete";
+    }
+    });
+
+        // Add Members Form Submission
+        document.getElementById("addMemberButton").addEventListener("click", () => {
+      const newField = document.createElement("div");
+      newField.className = "member-item flex items-center justify-between bg-gray-50 p-2 rounded";
+      newField.innerHTML = `
+        <input type="text" name="members[]" class="w-3/4 p-2 border rounded" required>
+        <button type="button" class="delete-member-btn p-2 text-red-500 hover:text-red-700">❌</button>
+      `;
+      document.getElementById("membersContainer").appendChild(newField);
+
+      newField.querySelector(".delete-member-btn").addEventListener("click", () => {
+        newField.remove();
+      });
+    });
+
+    document.getElementById("addMembersForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const response = await fetch(form.action, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: new URLSearchParams(new FormData(form))
+      });
+
+      const data = await response.json();
+      if (!response.ok) alert(data.error || "Save failed");
+    });
+
+        
+
+  </script>
+</body>
+</html>
