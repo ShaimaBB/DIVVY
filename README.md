@@ -19,7 +19,7 @@ DIVVY is a full-stack web application that helps groups split shared expenses. W
 ## 🚀 Tech Stack
 
 **Frontend**
-- HTML
+- HTML, ejs
 - Tailwind CSS
 
 **Backend**
