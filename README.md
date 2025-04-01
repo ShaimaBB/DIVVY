@@ -4,6 +4,10 @@ DIVVY is a full-stack web application that helps groups split shared expenses. W
 
 
 
+
+https://github.com/user-attachments/assets/bce68e24-99f5-4129-b1dd-41262b0fe76f
+
+
 ## ✨ Features
 
 - 🔐 User authentication (signup, login, logout)
