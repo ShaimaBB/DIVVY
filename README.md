@@ -53,7 +53,7 @@ https://github.com/user-attachments/assets/b73cec93-4b90-4f45-8f50-eb5d88d7131c
 - [ ] Add Bill photo scanning feature to exact amount (using tesseract)
 - [ ] Add email invites to group
 - [ ] Add data export/share balance summary (pdf format  
-- [ ] Add dark mode 🌙  
+- [ ] Add dark mode
 
 
 ---
