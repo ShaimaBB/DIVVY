@@ -2,7 +2,7 @@
 
 DIVVY is a full-stack web application that helps groups split shared expenses. Whether you're managing a household, trip, or event, DIVVY ensures that everyone knows what they owe — and who paid what.
 
-## ✨ Features
+##  Features
 
 -  User authentication (signup, login, logout)
 -  Create and manage groups (e.g., "Trip to Lisbon", "Apartment/House Expenses")
@@ -12,7 +12,7 @@ DIVVY is a full-stack web application that helps groups split shared expenses. W
 -  Mark payments as complete(paid)
 
 ---
-## 🚀 Tech Stack
+##  Tech Stack
 
 **Frontend**
 - HTML, EJS
@@ -26,7 +26,7 @@ DIVVY is a full-stack web application that helps groups split shared expenses. W
 - express-session (for user sessions)
 
 ---
-## 🎥 Demo Recording:
+##  Demo Recording:
 
 -  User authentication (signup, login, logout)
 
@@ -46,7 +46,7 @@ https://github.com/user-attachments/assets/b73cec93-4b90-4f45-8f50-eb5d88d7131c
 
 
 ---
-## ✅ Todo / Improvements
+##  Todo / Improvements
 
 - [ ] Calculate per-person shares including the group creator (have to fix bugs) 
 - [ ] Show history of payments
@@ -58,13 +58,13 @@ https://github.com/user-attachments/assets/b73cec93-4b90-4f45-8f50-eb5d88d7131c
 
 ---
 
-## 🚧 Status: In Progress
+##  Status: In Progress
 
 This project is actively being developed. Basic functionality works, and new features and fixes are being added.
 
 ---
 
-## 👩‍💻 Creator
+##  Creator
 
 **Shaima Binte Bashar**  
 
