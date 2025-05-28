@@ -1,4 +1,4 @@
-# 💸 DIVVY – Group Expense Sharing App
+# DIVVY – Group Expense Sharing App
 
 DIVVY is a full-stack web application that helps groups split shared expenses. Whether you're managing a household, trip, or event, DIVVY ensures that everyone knows what they owe — and who paid what.
 
