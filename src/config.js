@@ -18,7 +18,6 @@ const LoginSchema = new mongoose.Schema({
     }
 });
 
-// Group Schema
 const GroupSchema = new mongoose.Schema({
     name: { type: String, required: true },
     creator: { type: String, required: true }, // Creator's username
