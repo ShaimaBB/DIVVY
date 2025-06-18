@@ -62,6 +62,6 @@ This project is actively being developed. Basic functionality works, and new fea
 
 ##  Creator
 
-**Shaima Binte Bashar**  
+**Shaima Bashar**  
 
----
+
