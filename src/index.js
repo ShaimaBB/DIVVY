@@ -6,7 +6,6 @@ const session = require("express-session");
 
 const app = express();
 
-// Middleware and configurations
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
@@ -59,7 +58,7 @@ app.use((req, res, next) => {
 
 app.post("/login", async (req, res) => {
     try {
-        console.log("Request Body:", req.body); // Debugging
+        console.log("Request Body:", req.body); 
         const { username, password } = req.body;
 
         if (!username || !password) {
@@ -75,7 +74,7 @@ app.post("/login", async (req, res) => {
         const isPasswordMatch = await bcrypt.compare(password, user.password);
         if (isPasswordMatch) {
             console.log("Login successful for user:", username);
-            req.session.username = user.name; // Set session property
+            req.session.username = user.name; 
             return res.redirect("/dashboard");
         } else {
             console.error("Incorrect password.");
@@ -103,7 +102,7 @@ app.get("/dashboard", async (req, res) => {
   }
 });
 
-// Create Group
+
 app.post("/create-group", async (req, res) => {
   try {
     const { groupName } = req.body;
@@ -134,7 +133,7 @@ app.get("/add-members/:groupId", async (req, res) => {
     res.render("addMembers", {
       group,
       members: group.members,
-      currentUser: req.session.username // Pass current user to template
+      currentUser: req.session.username
     });
   } catch (error) {
     console.error("Add Members Error:", error);
